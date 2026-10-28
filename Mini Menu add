@@ -1,11 +1,173 @@
-rint("=== MENU ===")
-print("1 - ver mensagem")
-print("0 - Sair")
+# Inicialização dos dados da conta
+titular = "João Silva"
+saldo_conta = 500.00
+saldo_guardado = 150.00
+dinheiro_na_mao = 0.00
+divida_emprestimo = 0.00
 
-opcao = input("Escolha: ")
+# Mensagem de boas-vindas exibida automaticamente no início
+print(f"Olá, {titular}! Bem-vindo ao seu Banco Digital.\n")
 
-if opcao == "1":
-    print("Bem-Vindo!")
+while True:
+    print("\n=== BANCO DIGITAL ===")
+    print(f"Cliente: {titular}")
+    print(f"Saldo em Conta: R$ {saldo_conta:.2f}")
+    print(f"Saldo Guardado: R$ {saldo_guardado:.2f}")
+    print(f"Dinheiro na Mão: R$ {dinheiro_na_mao:.2f}")
+    if divida_emprestimo > 0:
+        print(f"Dívida de Empréstimo: R$ {divida_emprestimo:.2f}")
+    print("---------------------")
+    print("1 - Consultar Saldos")
+    print("2 - Realizar Saque")
+    print("3 - Realizar Depósito")
+    print("4 - Pagar Boleto")
+    print("5 - Guardar / Resgatar Dinheiro")
+    print("6 - Pagar Dívida do Empréstimo")
+    print("0 - Sair")
+    print("=====================")
 
-if opcao == "0":
-    print("Encerrando")
+    opcao = input("Escolha uma opção: ")
+
+    if opcao == "1":
+        print(f"\n--- DETALHAMENTO DOS SALDOS ---")
+        print(f"Saldo Disponível em Conta: R$ {saldo_conta:.2f}")
+        print(f"Saldo Reservado (Guardado): R$ {saldo_guardado:.2f}")
+        print(f"Dinheiro em Mãos (Físico): R$ {dinheiro_na_mao:.2f}")
+        print(f"Dívida de Empréstimos: R$ {divida_emprestimo:.2f}")
+        saldo_liquido = saldo_conta + saldo_guardado + dinheiro_na_mao - divida_emprestimo
+        print(f"Patrimônio Líquido Total: R$ {saldo_liquido:.2f}")
+
+    elif opcao == "2":
+        try:
+            valor_saque = float(input("Digite o valor do saque: R$ "))
+            if valor_saque <= 0:
+                print("\nErro: O valor do saque deve ser maior que zero.")
+            elif valor_saque > saldo_conta:
+                print(f"\n[ERRO] Saldo insuficiente na conta corrente!")
+                print(f"Você tentou sacar R$ {valor_saque:.2f}, mas possui apenas R$ {saldo_conta:.2f} na conta.")
+                print("--------------------------------------------")
+                print("O que deseja fazer?")
+                print("1 - Solicitar Empréstimo para cobrir o saque")
+                print("2 - Voltar ao Menu Principal")
+                print("0 - Sair do Sistema")
+                
+                decisao = input("Escolha uma opção: ").strip()
+                
+                if decisao == "1":
+                    diferenca = valor_saque - saldo_conta
+                    divida_emprestimo += diferenca
+                    saldo_conta += diferenca
+                    saldo_conta -= valor_saque
+                    dinheiro_na_mao += valor_saque
+                    print(f"\nEmpréstimo de R$ {diferenca:.2f} concedido com juros acumulados!")
+                    print(f"Saque de R$ {valor_saque:.2f} realizado com sucesso!")
+                    print(f"--- COMPOSIÇÃO ATUAL ---")
+                    print(f"Saldo em Conta: R$ {saldo_conta:.2f}")
+                    print(f"Saldo Guardado: R$ {saldo_guardado:.2f}")
+                    print(f"Dinheiro na Mão: R$ {dinheiro_na_mao:.2f}")
+                elif decisao == "0":
+                    print("\nEncerrando o sistema. Até logo!")
+                    break
+                else:
+                    print("\nRetornando ao menu principal...")
+            else:
+                saldo_conta -= valor_saque
+                dinheiro_na_mao += valor_saque
+                print(f"\nSaque de R$ {valor_saque:.2f} realizado com sucesso!")
+                print(f"--- COMPOSIÇÃO ATUAL ---")
+                print(f"Saldo em Conta: R$ {saldo_conta:.2f}")
+                print(f"Saldo Guardado: R$ {saldo_guardado:.2f}")
+                print(f"Dinheiro na Mão: R$ {dinheiro_na_mao:.2f}")
+        except ValueError:
+            print("\nErro: Por favor, digite um valor numérico válido.")
+
+    elif opcao == "3":
+        try:
+            valor_deposito = float(input("Digite o valor do depósito: R$ "))
+            if valor_deposito <= 0:
+                print("\nErro: O valor do depósito deve ser maior que zero.")
+            else:
+                saldo_conta += valor_deposito
+                print(f"\nDepósito de R$ {valor_deposito:.2f} realizado com sucesso em sua conta!")
+        except ValueError:
+            print("\nErro: Por favor, digite um valor numérico válido.")
+
+    elif opcao == "4":
+        try:
+            codigo_barras = input("Digite o código de barras do boleto (apenas números): ")
+            if len(codigo_barras) < 5:
+                print("\nErro: Código de barras inválido.")
+                continue
+                
+            valor_boleto = float(input("Digite o valor do boleto: R$ "))
+            if valor_boleto <= 0:
+                print("\nErro: O valor do boleto deve ser maior que zero.")
+            elif valor_boleto > saldo_conta:
+                print(f"\nErro: Saldo insuficiente na conta corrente para pagar este boleto de R$ {valor_boleto:.2f}.")
+            else:
+                saldo_conta -= valor_boleto
+                print(f"\nBoleto pago com sucesso! Valor debitado: R$ {valor_boleto:.2f}")
+        except ValueError:
+            print("\nErro: Por favor, digite um valor numérico válido.")
+
+    elif opcao == "5":
+        print("\n--- GUARDAR / RESGATAR DINHEIRO ---")
+        print("1 - Guardar dinheiro (Tirar da Conta -> Guardado)")
+        print("2 - Resgatar dinheiro (Tirar do Guardado -> Conta)")
+        sub_opcao = input("Escolha uma ação: ")
+        
+        if sub_opcao == "1":
+            try:
+                valor = float(input("Valor para guardar: R$ "))
+                if valor <= 0:
+                    print("\nErro: O valor deve ser maior que zero.")
+                elif valor > saldo_conta:
+                    print("\nErro: Saldo em conta insuficiente para guardar.")
+                else:
+                    saldo_conta -= valor
+                    saldo_guardado += valor
+                    print(f"\nVocê guardou R$ {valor:.2f} com sucesso!")
+            except ValueError:
+                print("\nErro: Valor inválido.")
+        elif sub_opcao == "2":
+            try:
+                valor = float(input("Valor para resgatar: R$ "))
+                if valor <= 0:
+                    print("\nErro: O valor deve ser maior que zero.")
+                elif valor > saldo_guardado:
+                    print("\nErro: Você não tem esse valor guardado para resgatar.")
+                else:
+                    saldo_guardado -= valor
+                    saldo_conta += valor
+                    print(f"\nVocê resgatou R$ {valor:.2f} para sua conta com sucesso!")
+            except ValueError:
+                print("\nErro: Valor inválido.")
+
+    elif opcao == "6":
+        if divida_emprestimo <= 0:
+            print("\nVocê não possui dívidas pendentes de empréstimo.")
+        else:
+            try:
+                print(f"\nSua dívida atual é de: R$ {divida_emprestimo:.2f}")
+                valor_pagamento = float(input("Quanto deseja pagar da dívida? R$ "))
+                if valor_pagamento <= 0:
+                    print("\nErro: O valor do pagamento deve ser maior que zero.")
+                elif valor_pagamento > saldo_conta:
+                    print("\nErro: Saldo em conta insuficiente para realizar o pagamento.")
+                else:
+                    saldo_conta -= valor_pagamento
+                    divida_emprestimo -= valor_pagamento
+                    if divida_emprestimo < 0:
+                        saldo_conta += abs(divida_emprestimo)
+                        divida_emprestimo = 0.0
+                    print(f"\nPagamento de dívida de R$ {valor_pagamento:.2f} realizado!")
+                    print(f"Dívida restante: R$ {divida_emprestimo:.2f}")
+            except ValueError:
+                print("\nErro: Por favor, digite um valor numérico válido.")
+
+    elif opcao == "0":
+        print("\nEncerrando o sistema. Até logo!")
+        break
+
+    else:
+        print("\nOpção inválida! Tente novamente.")
